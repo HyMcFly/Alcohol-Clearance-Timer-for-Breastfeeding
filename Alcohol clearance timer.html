@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Alcohol clearance timer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F2F5F7;--card:#fff;--ink:#1c2733;--mute:#5d6b78;--line:#d9e0e6;--a:#0f6e6e;--drive:#b4570f;--fast:#2c7a4b;--avg:#0f6e6e;--cons:#5b3fa0;--inp:#f7f9fa;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#12181e;--card:#1b242c;--ink:#e8eef2;--mute:#9aa9b6;--line:#2c3945;--a:#4fc3c3;--drive:#f0a05a;--fast:#6fd093;--avg:#4fc3c3;--cons:#b7a2f0;--inp:#141c22}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#12181e;--card:#1b242c;--ink:#e8eef2;--mute:#9aa9b6;--line:#2c3945;--a:#4fc3c3;--drive:#f0a05a;--fast:#6fd093;--avg:#4fc3c3;--cons:#b7a2f0;--inp:#141c22}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 'DM Sans',system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:620px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:26px;line-height:1.15;margin:8px 0 4px;letter-spacing:-.02em}
+h2{font-size:17px;margin:0 0 10px}
+.sub{color:var(--mute);margin:0 0 18px;font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+label{font-size:13px;color:var(--mute);display:block;margin-bottom:3px}
+input,select{font:inherit;color:var(--ink);background:var(--inp);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;min-width:0}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+.f{flex:1 1 90px}
+.drink{display:grid;grid-template-columns:1fr auto;gap:8px 12px;padding:10px 0;border-top:1px solid var(--line)}
+.drink:first-of-type{border-top:0}
+.dn{font-weight:700}
+.dn small{display:block;font-weight:400;color:var(--mute);font-size:12px}
+.step{display:flex;align-items:center;gap:10px}
+.step button{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--inp);color:var(--ink);font-size:22px;cursor:pointer}
+.step b{min-width:22px;text-align:center;font-size:20px}
+.dsz{grid-column:1/-1;display:flex;gap:8px}
+.dsz div{flex:1}
+.nowbtn{background:var(--inp);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;cursor:pointer;font:inherit;font-size:13px}
+.timer{border-left:6px solid var(--c);padding-left:12px;margin-bottom:12px}
+.timer .t{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
+.timer .n{font-weight:700;color:var(--c)}
+.pair{display:flex;gap:16px;flex-wrap:wrap;margin-top:6px}.pair>div{flex:1 1 140px}
+.timer .s{font-size:13px;color:var(--mute)}
+.stat{display:flex;justify-content:space-between;gap:8px;font-size:14px;padding:4px 0}
+.stat b{font-variant-numeric:tabular-nums}
+details{font-size:14px;color:var(--mute)}
+summary{cursor:pointer;color:var(--ink);font-weight:700;font-size:15px}
+details p,details li{margin:8px 0}
+.reset{background:none;border:1px solid var(--line);color:var(--mute);border-radius:8px;padding:8px 14px;font:inherit;cursor:pointer}
+.seg{display:flex;gap:6px;margin-bottom:10px}.seg button{flex:1;padding:8px 4px;border:1px solid var(--line);background:var(--inp);color:var(--ink);border-radius:8px;font:inherit;font-size:14px;cursor:pointer}.seg button.on{background:var(--a);color:var(--bg);border-color:var(--a);font-weight:700}
+.big{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.15}
+.mr{margin:10px 0}.mr .top{display:flex;justify-content:space-between;gap:8px;font-size:14px;margin-bottom:3px}.mr .top span:last-child{color:var(--mute);text-align:right}
+.bar{height:10px;border-radius:5px;background:var(--inp);border:1px solid var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--a)}
+.ref{display:flex;justify-content:space-between;gap:8px;font-size:14px;padding:3px 0}.ref.me{font-weight:700;color:var(--a)}
+.tag{display:inline-block;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:0 6px;margin-right:4px;color:var(--ink)}
+</style>
+</head>
+<body>
+<main>
+<h1>Alcohol clearance timer</h1>
+<p class="sub">Estimates how long until alcohol is gone from your blood, and so from your milk. It is a model, not a breathalyser.</p>
+
+<section class="card" aria-label="About you">
+<h2>You</h2>
+<div class="row">
+<div class="f"><label for="w">Weight</label><input id="w" type="number" inputmode="decimal" min="30" max="250"></div>
+<div class="f"><label for="wu">Unit</label><select id="wu"><option value="lb">lb</option><option value="kg">kg</option></select></div>
+<div class="f"><label for="ft">Height (ft)</label><input id="ft" type="number" inputmode="numeric" min="3" max="7"></div>
+<div class="f"><label for="inch">Inches</label><input id="inch" type="number" inputmode="decimal" min="0" max="11.9"></div>
+</div>
+</section>
+
+<section class="card" aria-label="Drinks">
+<h2>Drinks</h2>
+<div id="drinks"></div>
+<div class="row" style="margin-top:8px">
+<div class="f"><label for="first">First drink at</label><input id="first" type="time"></div>
+<button class="nowbtn" data-now="first" style="align-self:flex-end">Now</button>
+<div class="f"><label for="last">Last drink at</label><input id="last" type="time"></div>
+<button class="nowbtn" data-now="last" style="align-self:flex-end">Now</button>
+</div>
+<p class="sub" style="margin:8px 0 0;font-size:12px">Drinks are spread evenly between first and last. One drink: set both times the same.</p>
+</section>
+
+<section class="card" aria-label="Timers">
+<h2>Timers</h2>
+<div id="timers"></div>
+<div class="row" style="margin-top:4px">
+<div class="f" style="max-width:180px"><label for="limit">Driving limit (BAC %)</label><input id="limit" type="number" inputmode="decimal" step="0.01" min="0" max="0.08"></div>
+<p class="sub" style="margin:18px 0 0;font-size:12px;flex:1 1 200px">Default 0.05, the general South Australian limit. Set 0 for a zero-tolerance licence.</p>
+</div>
+</section>
+
+<section class="card" aria-label="Estimates">
+<h2>Right now</h2>
+<div class="stat"><span>Estimated BAC now (average clearer)</span><b id="bnow">–</b></div>
+<div class="stat"><span>Estimated peak (average clearer)</span><b id="bpeak">–</b></div>
+<div class="stat"><span>Pure alcohol logged</span><b id="grams">–</b></div>
+<div class="stat"><span>Standard drinks (10 g each)</span><b id="sd">–</b></div>
+</section>
+
+<section class="card" aria-label="Alcohol in milk">
+<h2>Alcohol in 100 mL of your milk</h2>
+<div class="seg" id="mseg" role="group" aria-label="Clearance speed"><button type="button" data-r="0.020">Fast</button><button type="button" data-r="0.015">Average</button><button type="button" data-r="0.010">Conservative</button></div>
+<div class="big" id="mnow">–</div>
+<div class="sub" id="mcmp" style="margin:2px 0 6px"></div>
+<div id="mrows"></div>
+<h2 style="margin-top:16px;font-size:15px">The one scale: grams of alcohol per 100 mL</h2>
+<div id="mref"></div>
+<p class="sub" style="margin:10px 0 0;font-size:12px">Bars show how much of your peak is still left. Milk is assumed to match blood alcohol (0.015 BAC means 0.015 g per 100 mL). Studies find them close, not identical. Alcohol-free beer is taken as 0.5% ABV, the usual upper limit for that label.</p>
+</section>
+
+<section class="card">
+<details>
+<summary>How this works, and how sure it is</summary>
+<p><span class="tag">Established</span>Alcohol passes from blood into milk and the two levels track each other closely, so when your blood alcohol is zero, your milk is too. Only time clears it.</p>
+<p><span class="tag">Model</span>Peak BAC uses the Widmark approach with your body water estimated by the Watson formula (female) from your height and weight. Alcohol is treated as fully absorbed straight away, which slightly overstates the peak and does not change when it reaches zero.</p>
+<p><span class="tag">Model</span>Clearance is a steady rate per hour (the rates below are population ranges, not yours):</p>
+<ul>
+<li>Fast: 0.020 BAC points per hour</li>
+<li>Average: 0.015 per hour</li>
+<li>Conservative: 0.010 per hour</li>
+</ul>
+<p><span class="tag">Limit</span>Real rates vary person to person and day to day, and the drink sizes and strengths here are typical values you can edit. Strong cocktails and generous pours are the usual surprise. Being under a legal limit does not mean you are unimpaired.</p>
+</details>
+</section>
+
+<button class="reset" id="reset">Reset everything</button>
+</main>
+
+<script>
+(function(){
+var TYPES=[
+{id:'wine',name:'Wine',icon:'🍷',note:'glass',ml:150,abv:12.5},
+{id:'cocktail',name:'Cocktail',icon:'🍸',note:'one typical serve, about two shots',ml:120,abv:20},
+{id:'beer',name:'Beer',icon:'🍺',note:'regular strength',ml:375,abv:4.8},
+{id:'seltzer',name:'Hard seltzer',icon:'🥤',note:'can',ml:330,abv:4.5}];
+var TIMERS=[
+{id:'fast',name:'Fast clearer',rate:0.020,col:'--fast'},
+{id:'avg',name:'Average clearer',rate:0.015,col:'--avg'},
+{id:'cons',name:'Conservative clearer',rate:0.010,col:'--cons'}];
+var KEY='alc-clear-v1';
+function fresh(){var now=Date.now(),t={};TYPES.forEach(function(x){t[x.id]={ml:x.ml,abv:x.abv}});
+return{w:129,wu:'lb',ft:5,inch:6,limit:0.05,first:now,last:now,counts:{},types:t}}
+var S=fresh();
+try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);if(p&&p.types)S=Object.assign(fresh(),p)}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function $(id){return document.getElementById(id)}
+
+/* build drink rows once */
+var dEl=$('drinks');
+TYPES.forEach(function(t){
+var d=document.createElement('div');d.className='drink';
+d.innerHTML='<div class="dn">'+t.icon+' '+t.name+'<small>'+t.note+'</small></div>'+
+'<div class="step"><button type="button" aria-label="Fewer '+t.name+'" data-d="-1" data-t="'+t.id+'">−</button><b id="c-'+t.id+'">0</b><button type="button" aria-label="More '+t.name+'" data-d="1" data-t="'+t.id+'">+</button></div>'+
+'<div class="dsz"><div><label for="ml-'+t.id+'">Size (mL)</label><input id="ml-'+t.id+'" type="number" inputmode="decimal" min="1"></div>'+
+'<div><label for="abv-'+t.id+'">Strength (% ABV)</label><input id="abv-'+t.id+'" type="number" inputmode="decimal" step="0.1" min="0" max="100"></div></div>';
+dEl.appendChild(d)});
+var tEl=$('timers');
+TIMERS.forEach(function(t){
+var d=document.createElement('div');d.className='timer';d.style.setProperty('--c','var('+t.col+')');
+d.innerHTML='<div class="n">'+t.name+' <span class="s">('+t.rate.toFixed(3)+' per hour)</span></div><div class="pair"><div><div class="s">Safe to drive</div><div class="t" id="d-'+t.id+'">–</div><div class="s" id="ds-'+t.id+'"></div></div><div><div class="s">Zero</div><div class="t" id="t-'+t.id+'">–</div><div class="s" id="s-'+t.id+'"></div></div></div>';
+tEl.appendChild(d)});
+
+function hhmm(ms){var d=new Date(ms);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+function toMs(v){if(!v)return Date.now();var a=v.split(':').map(Number),d=new Date();d.setHours(a[0],a[1],0,0);var t=d.getTime();if(t>Date.now()+600000)t-=864e5;return t}
+function fill(){
+$('w').value=S.w;$('wu').value=S.wu;$('ft').value=S.ft;$('inch').value=S.inch;$('limit').value=S.limit;
+$('first').value=hhmm(S.first);$('last').value=hhmm(S.last);
+TYPES.forEach(function(t){$('ml-'+t.id).value=S.types[t.id].ml;$('abv-'+t.id).value=S.types[t.id].abv;$('c-'+t.id).textContent=S.counts[t.id]||0})}
+fill();
+
+/* wiring */
+function num(id,key,dec){$(id).addEventListener('input',function(){var v=parseFloat(this.value);if(!isNaN(v)){S[key]=v;save();tick()}})}
+num('w','w');num('ft','ft');num('inch','inch');num('limit','limit');
+$('wu').addEventListener('change',function(){
+var v=+S.w;if(this.value==='kg'&&S.wu==='lb')v=Math.round(v*0.45359237*10)/10;if(this.value==='lb'&&S.wu==='kg')v=Math.round(v/0.45359237);
+S.w=v;S.wu=this.value;$('w').value=v;save();tick()});
+$('first').addEventListener('change',function(){S.first=toMs(this.value);save();tick()});
+$('last').addEventListener('change',function(){S.last=toMs(this.value);save();tick()});
+document.querySelectorAll('[data-now]').forEach(function(b){b.addEventListener('click',function(){var k=b.getAttribute('data-now');S[k]=Date.now();$(k).value=hhmm(S[k]);save();tick()})});
+TYPES.forEach(function(t){
+['ml','abv'].forEach(function(f){$(f+'-'+t.id).addEventListener('input',function(){var v=parseFloat(this.value);if(!isNaN(v)&&v>=0){S.types[t.id][f]=v;save();tick()}})})});
+dEl.addEventListener('click',function(e){var b=e.target.closest('button[data-t]');if(!b)return;
+var id=b.getAttribute('data-t'),c=Math.max(0,(S.counts[id]||0)+ +b.getAttribute('data-d'));S.counts[id]=c;$('c-'+id).textContent=c;
+if(c>0&&(S.first>Date.now()||S.last>Date.now())){} save();tick()});
+$('reset').addEventListener('click',function(){if(!confirm('Clear all drinks and settings?'))return;S=fresh();save();fill();tick()});
+
+/* model */
+function body(){var w=+S.w;if(S.wu==='lb')w*=0.45359237;var h=((+S.ft)*12+(+S.inch))*2.54;
+var tbw=-2.097+0.1069*h+0.2466*w;if(!(tbw>10))tbw=10;return 0.0806/tbw} /* BAC points per gram alcohol */
+function events(){
+var gs=[];TYPES.forEach(function(t){var c=S.counts[t.id]||0,g=S.types[t.id].ml*S.types[t.id].abv/100*0.789;for(var i=0;i<c;i++)gs.push(g)});
+var a=Math.min(S.first,S.last),b=Math.max(S.first,S.last),n=gs.length;
+return gs.map(function(g,i){return{t:n>1?a+(b-a)*i/(n-1):a,g:g}})}
+function run(rate,k,ev,now){
+var bac=0,tp=null,peak=0;
+for(var i=0;i<ev.length;i++){var e=ev[i];
+if(tp!==null)bac=Math.max(0,bac-rate*(e.t-tp)/3.6e6);
+bac+=e.g*k;if(bac>peak)peak=bac;tp=e.t}
+var res={peak:peak,last:bac,tLast:tp};
+res.zeroAt=tp===null?null:tp+bac/rate*3.6e6;
+/* BAC at "now": replay only events up to now */
+var b2=0,t2=null;
+for(var j=0;j<ev.length;j++){if(ev[j].t>now)break;if(t2!==null)b2=Math.max(0,b2-rate*(ev[j].t-t2)/3.6e6);b2+=ev[j].g*k;t2=ev[j].t}
+res.now=t2===null?0:Math.max(0,b2-rate*(now-t2)/3.6e6);
+return res}
+function clock(ms){var d=new Date(ms),n=new Date(),t=d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+var dd=Math.round((new Date(d.getFullYear(),d.getMonth(),d.getDate())-new Date(n.getFullYear(),n.getMonth(),n.getDate()))/864e5);
+return dd===0?t:dd===1?t+' tomorrow':dd===-1?t+' yesterday':t+' '+d.toLocaleDateString([], {weekday:'short'})}
+function dur(ms){var s=Math.ceil(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;
+return h+':'+String(m).padStart(2,'0')+':'+String(x).padStart(2,'0')}
+
+function tick(){
+var now=Date.now(),k=body(),ev=events(),total=ev.reduce(function(a,e){return a+e.g},0);
+$('grams').textContent=total?total.toFixed(1)+' g':'–';
+$('sd').textContent=total?(total/10).toFixed(1):'–';
+if(!ev.length){
+$('bnow').textContent='–';$('bpeak').textContent='–';milkEmpty();
+TIMERS.forEach(function(t){$('t-'+t.id).textContent='–';$('d-'+t.id).textContent='–';$('s-'+t.id).textContent='Add a drink to start';$('ds-'+t.id).textContent=''});return}
+var avg=run(0.015,k,ev,now);
+$('bnow').textContent=avg.now.toFixed(3);$('bpeak').textContent=avg.peak.toFixed(3);milk(k,ev,now);
+var lim=Math.max(0,+S.limit||0);
+TIMERS.forEach(function(t){
+var r=run(t.rate,k,ev,now);
+show('d-'+t.id,'ds-'+t.id,r.tLast+Math.max(0,r.last-lim)/t.rate*3.6e6,now,'Under '+lim.toFixed(2)+' at ','Under the limit since ');
+show('t-'+t.id,'s-'+t.id,r.zeroAt,now,'Zero at ','Estimated zero since ')})}
+function show(a,b,at,now,fut,past){var rem=at-now,el=$(a),sub=$(b);
+if(rem<=0){el.textContent='Clear ✓';sub.textContent=past+clock(at)}
+else{el.textContent=dur(rem);sub.textContent=fut+clock(at)}}
+var AFB=0.5*0.789;
+function cmp(b){if(b<=0)return 'Zero';var r=b/AFB;if(r>=1)return (r>=10?Math.round(r):r.toFixed(1))+'× alcohol-free beer';var p=r*100;return (p>=10?Math.round(p):p.toFixed(1))+'% of alcohol-free beer'}
+function gfmt(v){return v>=1?v.toFixed(1):v.toFixed(3)}
+function milkEmpty(){$('mnow').textContent='–';$('mcmp').textContent='Add a drink to see this';$('mrows').innerHTML='';$('mref').innerHTML='';document.querySelectorAll('#mseg button').forEach(function(x){x.classList.toggle('on',+x.getAttribute('data-r')===(S.mr||0.015))})}
+function milk(k,ev,now){
+var rate=S.mr||0.015;
+document.querySelectorAll('#mseg button').forEach(function(x){x.classList.toggle('on',+x.getAttribute('data-r')===rate)});
+var r=run(rate,k,ev,now),cur=r.now;
+$('mnow').textContent=cur>0?(cur<0.001?'<0.001':cur.toFixed(3))+' g':'0 g';
+$('mcmp').textContent=cur>0?'That is '+cmp(cur):'Zero';
+var rows=[['Now',0],['In 1 hour',1],['In 2 hours',2],['In 3 hours',3],['In 4 hours',4],['In 6 hours',6]],h='';
+rows.forEach(function(x){var b=run(rate,k,ev,now+x[1]*3.6e6).now,w=r.peak>0?Math.min(100,b/r.peak*100):0;
+h+='<div class="mr"><div class="top"><span>'+x[0]+'</span><span>'+cmp(b)+'</span></div><div class="bar"><i style="width:'+w.toFixed(1)+'%"></i></div></div>'});
+$('mrows').innerHTML=h;
+var refs=TYPES.map(function(t){return{n:t.name+' ('+S.types[t.id].abv+'%)',v:S.types[t.id].abv*0.789}});
+refs.push({n:'Alcohol-free beer (0.5%)',v:AFB});refs.push({n:'Your milk now',v:cur,me:1});
+refs.sort(function(a,b){return b.v-a.v});
+$('mref').innerHTML=refs.map(function(x){return '<div class="ref'+(x.me?' me':'')+'"><span>'+x.n+'</span><span>'+(x.v>0?gfmt(x.v)+' g':'0 g')+'</span></div>'}).join('')}
+$('mseg').addEventListener('click',function(e){var b=e.target.closest('button[data-r]');if(!b)return;S.mr=+b.getAttribute('data-r');save();tick()});
+tick();setInterval(tick,1000);
+})();
+</script>
+</body>
+</html>
